@@ -4,8 +4,8 @@ public enum MoveDirection
 {
     Idle,
     Up,
-    Down,
     Right,
+    Down,
     Left
 }
 
@@ -75,11 +75,6 @@ public class PlayerController : MonoBehaviour
             MoveDir = MoveDirection.Left;
             return;
         }
-    }
-
-    private void FixedUpdate()
-    {
-        ResetInput();
     }
 
     public void ResetInput() 

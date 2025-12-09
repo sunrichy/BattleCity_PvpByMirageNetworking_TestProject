@@ -40,7 +40,17 @@ public class Bullet : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Wall")
         {
-            Debug.Log(collision.tag);
+            GameObject target = collision.gameObject;
+            if (target.TryGetComponent(out ITakeDamage takeDamage)) 
+            {
+                takeDamage.TakeDamage();
+            }
+            Destroy(gameObject);
         }
     }
+}
+
+public interface ITakeDamage
+{
+    public void TakeDamage();
 }
