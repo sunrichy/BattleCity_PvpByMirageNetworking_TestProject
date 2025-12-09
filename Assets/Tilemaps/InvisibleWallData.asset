@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b5810e9f824753418090da164fe2c19, type: 3}
+  m_Name: InvisibleWallData
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: c60a5078c0adb8d47a2ae5a8d402fc51, type: 2}
+  gameObject: {fileID: 869630123268367122, guid: 375a2d37b4318194a88c3d0146f81024, type: 3}

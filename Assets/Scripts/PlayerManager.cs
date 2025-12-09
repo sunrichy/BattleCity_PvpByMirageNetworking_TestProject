@@ -31,7 +31,21 @@ public class PlayerManager : MonoBehaviour, ITakeDamage
 
         if(dir != Vector2.zero) 
         {
-            transform.position += (Vector3) (speed * dir) * Time.deltaTime;
+            Vector3 newPos = transform.position + (Vector3)(speed * dir) * Time.deltaTime;
+            Vector2 d = Camera.main.WorldToScreenPoint(newPos);
+
+            if (d.x < -10f || d.x > Screen.width + 10f ||
+                    d.y < -10f || d.y > Screen.height + 10f)
+            {
+
+            }
+            else 
+            {
+                transform.position = newPos;
+            }
+
+
+
             currentDir = playerController.MoveDir;
             transform.localRotation = Quaternion.Euler(90f * ((int) currentDir - 1) * Vector3.back);
         }
