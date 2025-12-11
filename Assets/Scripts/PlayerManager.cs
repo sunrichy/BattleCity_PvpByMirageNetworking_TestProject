@@ -1,22 +1,37 @@
+using Mirage;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour, ITakeDamage
+public class PlayerManager : NetworkBehaviour, ITakeDamage
 {
     [SerializeField] private PlayerController playerController;
     [SerializeField] private float speed = 5f;
 
     [SerializeField] private Bullet bullet;
 
+    [SyncVar]
     private MoveDirection currentDir = MoveDirection.Up;
+
+    [SyncVar]
     [SerializeField] private int hp = 5;
     [SerializeField] private Transform _frontTransform;
 
+    private void Start()
+    {
+        NetworkIdentity identity = gameObject.GetComponent<NetworkIdentity>();
+        
+        if (!IsLocalPlayer)
+        {
+            Destroy(playerController);
+        }
+    }
+
+    [ClientRpc]
     public void TakeDamage()
     {
         hp -= 1;
         if(hp <= 0) 
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 
@@ -54,13 +69,20 @@ public class PlayerManager : MonoBehaviour, ITakeDamage
         {
             if (playerController.Shoot) 
             {
-                Bullet b = Instantiate(bullet, null);
-                b.transform.position = _frontTransform.position;
-                b.Init(currentDir);
+                CmdFire();
             }
         }
 
         playerController.ResetInput();
     }
 
+
+    [ServerRpc]
+    private void CmdFire()
+    {
+        Bullet b = Instantiate(bullet, null);
+        b.transform.position = _frontTransform.position;
+        b.Init(currentDir);
+        GameManager.Instacne.networkManager.ServerObjectManager.Spawn(b.gameObject.GetComponent<NetworkIdentity>());
+    }
 }

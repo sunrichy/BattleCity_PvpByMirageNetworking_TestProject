@@ -1,9 +1,11 @@
+using Mirage;
 using UnityEngine;
 
-public class Wall : MonoBehaviour, ITakeDamage
+public class Wall : NetworkBehaviour, ITakeDamage
 {
     [SerializeField] private int hp;
     [SerializeField] private bool invisible;
+
     public void TakeDamage()
     {
         if (invisible) 
@@ -14,7 +16,14 @@ public class Wall : MonoBehaviour, ITakeDamage
         hp -= 1;
         if (hp <= 0) 
         {
-            Destroy(gameObject);
+            if (GameManager.Instacne.networkManager) 
+            {
+                GameManager.Instacne.networkManager.ServerObjectManager.Destroy(gameObject, true);
+            }
+            else 
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5448189632765867754}
   - component: {fileID: 8731427715983224945}
   - component: {fileID: -226325374263481623}
+  - component: {fileID: -6566687179338372603}
   m_Layer: 0
   m_Name: Wall_1Hp
   m_TagString: Wall
@@ -148,6 +149,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9721ba973afd05545ac9869e682fee38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SyncSettings:
+    From: 2
+    To: 3
+    Timing: 0
+    Interval: 0.1
   hp: 1
   invisible: 0
 --- !u!50 &-226325374263481623
@@ -177,3 +183,26 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-6566687179338372603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869630123268367122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnSettings:
+    SendPosition: 1
+    SendRotation: 0
+    SendScale: 0
+    SendName: 0
+    SendActive: 1
+  _sceneId: 0
+  _prefabHash: -200505415
+  ServerObjectManager: {fileID: 0}
+  ClientObjectManager: {fileID: 0}
+  _hasSpawned: 0

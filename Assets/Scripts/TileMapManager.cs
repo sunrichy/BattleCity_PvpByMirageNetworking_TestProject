@@ -1,20 +1,17 @@
 using Mirage;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class TileMapManager : MonoBehaviour
 {
-    NetworkManager networkManager;
     public TileData[] tile;
     public Tilemap tilemap;
+    public Transform[] playerSpawnPoints;
+    public Transform wallGrid;
 
     private Dictionary<TileBase, TileData> keyValuePairs = new();
-
-    private void Start()
-    {
-        GenMap();
-    }
 
     public void GenMap() 
     {
@@ -30,22 +27,58 @@ public class TileMapManager : MonoBehaviour
         foreach (Vector3Int posIndex in bounds.allPositionsWithin)
         {
             TileBase tile = tilemap.GetTile(posIndex);
+
             if (tile != null)
             {
                 if (!keyValuePairs.TryGetValue(tile, out var data))
                 {
                     continue;
                 }
+
+                NetworkManager networkManager = GameManager.Instacne.networkManager;
                 GameObject newGame = null;
+                newGame = Instantiate(data.gameObject, tilemap.layoutGrid.transform);
+                newGame.transform.position = tilemap.GetCellCenterWorld(posIndex);
+
                 if (networkManager && networkManager.Client.IsHost && !data.localOnly) 
                 {
-                    newGame = networkManager.ServerObjectManager.SpawnInstantiate(data.gameObject);
-                }
-                else 
+                    networkManager.ServerObjectManager.Spawn(newGame, newGame.GetOrAddComponent<NetworkIdentity>().PrefabHash);
+                }           
+            }
+        }
+
+        tilemap.gameObject.SetActive(false);
+    }
+
+    public void GenMapLocalOnly() 
+    {
+        keyValuePairs.Clear();
+
+        for (int i = 0; i < tile.Length; i++) 
+        {
+            keyValuePairs.Add(tile[i].tile, tile[i]);
+        }
+
+
+        BoundsInt bounds = tilemap.cellBounds;
+
+        foreach (Vector3Int posIndex in bounds.allPositionsWithin)
+        {
+            TileBase tile = tilemap.GetTile(posIndex);
+
+            if (tile != null)
+            {
+                if (!keyValuePairs.TryGetValue(tile, out var data))
                 {
-                    newGame = Instantiate(data.gameObject, tilemap.layoutGrid.transform);
+                    continue;
                 }
-                if(newGame) newGame.transform.position = tilemap.GetCellCenterWorld(posIndex);                    
+
+                if (data.localOnly)
+                {
+                    GameObject newGame = null;
+                    newGame = Instantiate(data.gameObject, tilemap.layoutGrid.transform);
+                    newGame.transform.position = tilemap.GetCellCenterWorld(posIndex);
+                }
             }
         }
 

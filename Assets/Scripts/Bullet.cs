@@ -1,3 +1,4 @@
+using Mirage;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -14,6 +15,10 @@ public class Bullet : MonoBehaviour
             return;
         }
 
+        if (!networkIdentity.IsHost) 
+        {
+            return;
+        }
         transform.position += vector2Dir * speed * Time.deltaTime;
 
         Vector2 d = Camera.main.WorldToScreenPoint(transform.position);
@@ -33,11 +38,19 @@ public class Bullet : MonoBehaviour
         }
 
         vector2Dir = direction.MoveDirectionToVector3();
+        networkIdentity = GetComponent<NetworkIdentity>();
         init = true;
     }
 
+    NetworkIdentity networkIdentity;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!networkIdentity || !networkIdentity.IsHost)
+        {
+            return;
+        }
+
         if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Wall")
         {
             GameObject target = collision.gameObject;
@@ -45,7 +58,8 @@ public class Bullet : MonoBehaviour
             {
                 takeDamage.TakeDamage();
             }
-            Destroy(gameObject);
+            // Destroy(gameObject);
+            GameManager.Instacne.networkManager.ServerObjectManager.Destroy(gameObject, true);
         }
     }
 }
