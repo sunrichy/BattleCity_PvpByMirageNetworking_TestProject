@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40f00cc958ecec34d9659ee9d7efdda0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
+  speed: 10
 --- !u!61 &2802340778467991763
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -216,9 +216,9 @@ MonoBehaviour:
   SyncSettings:
     From: 2
     To: 3
-    Timing: 0
-    Interval: 0.1
+    Timing: 2
+    Interval: 0.001
   ClientAuthority: 0
-  LocalPositionSensitivity: 0.01
-  LocalRotationSensitivity: 0.01
-  LocalScaleSensitivity: 0.01
+  LocalPositionSensitivity: 0
+  LocalRotationSensitivity: 10000
+  LocalScaleSensitivity: 10000

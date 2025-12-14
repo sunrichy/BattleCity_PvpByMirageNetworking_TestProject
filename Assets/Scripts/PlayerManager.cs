@@ -12,6 +12,9 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
     private MoveDirection currentDir = MoveDirection.Up;
 
     [SyncVar]
+    private float _speedSyncVar;
+
+    [SyncVar]
     [SerializeField] private int hp = 5;
     [SerializeField] private Transform _frontTransform;
 
@@ -39,6 +42,7 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
     {
         if (!playerController) 
         {
+            UpdateOnLocalPlayer();
             return;
         }
 
@@ -46,7 +50,8 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
 
         if(dir != Vector2.zero) 
         {
-            Vector3 newPos = transform.position + (Vector3)(speed * dir) * Time.deltaTime;
+            _speedSyncVar = speed * Time.deltaTime;
+            Vector3 newPos = transform.position + ( (Vector3) dir * _speedSyncVar );
             Vector2 d = Camera.main.WorldToScreenPoint(newPos);
 
             if (d.x < -10f || d.x > Screen.width + 10f ||
@@ -64,6 +69,10 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
             currentDir = playerController.MoveDir;
             transform.localRotation = Quaternion.Euler(90f * ((int) currentDir - 1) * Vector3.back);
         }
+        else 
+        {
+            _speedSyncVar = 0f;
+        }
 
         if (bullet) 
         {
@@ -76,6 +85,14 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
         playerController.ResetInput();
     }
 
+    private void UpdateOnLocalPlayer()
+    {
+        transform.localRotation = Quaternion.Euler(90f * ((int) currentDir - 1) * Vector3.back);
+
+        Vector2 dir = currentDir.MoveDirectionToVector3();
+        Vector3 newPos = transform.position + ((Vector3) dir * _speedSyncVar);
+        transform.position = newPos;
+    }
 
     [ServerRpc]
     private void CmdFire()

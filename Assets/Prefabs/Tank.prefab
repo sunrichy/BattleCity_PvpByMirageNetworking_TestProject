@@ -153,7 +153,7 @@ MonoBehaviour:
   SyncSettings:
     From: 1
     To: 6
-    Timing: 0
+    Timing: 2
     Interval: 0.1
   playerController: {fileID: 368286825980644060}
   speed: 5
@@ -326,9 +326,9 @@ MonoBehaviour:
   SyncSettings:
     From: 1
     To: 6
-    Timing: 2
-    Interval: 0.1
+    Timing: 0
+    Interval: 0.02
   ClientAuthority: 1
   LocalPositionSensitivity: 0.01
-  LocalRotationSensitivity: 0
+  LocalRotationSensitivity: 100
   LocalScaleSensitivity: 0.01
