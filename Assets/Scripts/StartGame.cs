@@ -12,17 +12,26 @@ public class StartGame : MonoBehaviour
     [SerializeField] private PlayerManager _playerManager;
 
     Dictionary<string, MapDataBase.TileMapData> dictionary;
+    [SerializeField] private GameObejectSetActionSetting _gameObjectWhenStartLoadGame;
+    [SerializeField] private GameObejectSetActionSetting _gameObjectWhenFinishLoadGame;
+
+    private float percentLoadGame;
 
     private void Awake()
     {
+        _gameObjectWhenStartLoadGame.RunSetActive();
+
         dictionary = _mapData.GetDictionaryMap();
         networkManager = GameManager.Instacne.networkManager;
 
         networkManager.Server.Disconnected.AddListener((c) => SceneManager.LoadScene(0));
         networkManager.Client.Disconnected.AddListener( (c) => SceneManager.LoadScene(0) );
+        
 
         if (!networkManager.Server.IsHost)
         {
+            networkManager.Client.MessageHandler.RegisterHandler<LoadScene>(OnGetLoadScene);
+
             if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
             {
                 TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
@@ -39,14 +48,22 @@ public class StartGame : MonoBehaviour
 
                 tileMapManager.GenMapLocalOnly();
             }
-
+            StartCoroutine(WaitLocal());
             return;
         }
-
-        StartCoroutine(Wait());
+        StartCoroutine(WaitServer());
     }
 
-    IEnumerator Wait() 
+    IEnumerator WaitLocal() 
+    {
+        while(percentLoadGame < 1f) 
+        {
+            yield return null;
+        }
+
+        _gameObjectWhenFinishLoadGame.RunSetActive();
+    }
+    IEnumerator WaitServer()
     {
         yield return new WaitForSeconds(2f);
 
@@ -54,7 +71,6 @@ public class StartGame : MonoBehaviour
         {
             TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
             tileMapManager.GenMap();
-
 
 
             for (int i = 0; i < networkManager.Server.AllPlayers.Count; i++)
@@ -66,10 +82,28 @@ public class StartGame : MonoBehaviour
                 b.transform.rotation = point.rotation;
                 NetworkIdentity identity = b.gameObject.GetComponent<NetworkIdentity>();
 
-                
+
                 networkManager.ServerObjectManager.AddCharacter(playerData, identity);
             }
 
         }
+
+        percentLoadGame = 1f;
+
+        networkManager.Server.SendToMany<LoadScene>(networkManager.Server.AllPlayers, new LoadScene() { percent = percentLoadGame} , true);
+        _gameObjectWhenFinishLoadGame.RunSetActive();
+        enabled = false;
+    }
+
+    [System.Serializable]
+    public struct LoadScene 
+    {
+        public float percent;
+    }
+
+    private void OnGetLoadScene(LoadScene loadScene) 
+    {
+        percentLoadGame = loadScene.percent;
+        networkManager.Client.MessageHandler.UnregisterHandler<LoadScene>();
     }
 }

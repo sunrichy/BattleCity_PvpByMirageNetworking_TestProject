@@ -15,6 +15,12 @@ public class TileMapManager : MonoBehaviour
 
     public void GenMap() 
     {
+        float x = 0f;
+        GenMap(ref x);
+    }
+
+    public void GenMap(ref float percentLoad) 
+    {
         keyValuePairs.Clear();
         for (int i = 0; i < tile.Length; i++) 
         {
@@ -22,7 +28,15 @@ public class TileMapManager : MonoBehaviour
         }
 
 
+        percentLoad = 0f;
+        int current = 0, max = 0;
+
         BoundsInt bounds = tilemap.cellBounds;
+
+        foreach (Vector3Int posIndex in bounds.allPositionsWithin)
+        {
+            max++;
+        }
 
         foreach (Vector3Int posIndex in bounds.allPositionsWithin)
         {
@@ -45,6 +59,8 @@ public class TileMapManager : MonoBehaviour
                     networkManager.ServerObjectManager.Spawn(newGame, newGame.GetOrAddComponent<NetworkIdentity>().PrefabHash);
                 }           
             }
+            current++;
+            percentLoad = current / max;
         }
 
         tilemap.gameObject.SetActive(false);

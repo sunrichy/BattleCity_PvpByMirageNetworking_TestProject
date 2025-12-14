@@ -1,14 +1,5 @@
 using UnityEngine;
 
-public enum MoveDirection
-{
-    Idle,
-    Up,
-    Right,
-    Down,
-    Left
-}
-
 public static class InGameTool
 {
     public static Vector3 MoveDirectionToVector3(this MoveDirection moveDirection) 
