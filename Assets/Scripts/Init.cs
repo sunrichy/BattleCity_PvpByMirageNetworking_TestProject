@@ -1,10 +1,10 @@
 using Mirage;
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 
 public class Init : MonoBehaviour
 {
@@ -18,6 +18,11 @@ public class Init : MonoBehaviour
     {
         GameManager gameManager = GameManager.Instacne;
 
+        if (GameManager.Instacne.networkManager)
+        {
+            Destroy(GameManager.Instacne.networkManager.gameObject);
+        }
+
         _singleplayerButton.onClick.AddListener(SingleplayerButton);
         _multiplayerButton.onClick.AddListener(MultiplayerButton);
         _exitButton.onClick.AddListener(ExitButton);
@@ -28,51 +33,21 @@ public class Init : MonoBehaviour
     private void Start()
     {
 
-        //_networkManager.Server.Started.AddListener(() => Debug.Log("Started"));
-        //_networkManager.Server.Connected.AddListener((s) => Debug.Log("Connected"));
-        //_networkManager.Server.OnStartHost.AddListener(() => Debug.Log("OnStartHost"));
-        //_networkManager.Server.OnStopHost.AddListener(() => Debug.Log("OnStopHost"));
-
-        //_networkManager.Server.StartServer(_networkManager.Client);
-        //_networkManager.Server.SetAuthenticationFailedCallback((p,r) => 
-        //{
-        //    Debug.Log(p.Identity + " : " + r.Success);
-        //});
-        
     }
 
     private void ExitButton()
     {
-        _networkManagerPrefab.Server.Stop();
-    }
+        if (GameManager.Instacne.networkManager)
+        {
+            Destroy(GameManager.Instacne.networkManager.gameObject);
+        }
 
-    private void OnServerAddPlayerInternal(INetworkPlayer player, AddCharacterMessage msg)
-    {
-        //if (player.HasCharacter)
-        //{
-        //    // player already has character on server, but client asked for it
-        //    // so we respawn it here so that client recieves it again
-        //    // this can happen when client loads normally, but server addititively
-        //    _networkManagerPrefab.ServerObjectManager.Spawn(player.Identity);
-        //}
-        //else
-        //{
-        //    OnServerAddPlayer(player);
-        //}
 
-        Debug.Log("INetworkPlayer " + player.Identity);
-    }
-
-    public virtual void OnServerAddPlayer(INetworkPlayer player)
-    {
-        //var startPos = GetStartPosition();
-        //var character = startPos != null
-        //    ? Instantiate(PlayerPrefab, startPos.position, startPos.rotation)
-        //    : Instantiate(PlayerPrefab);
-
-        //if (SetName)
-        //    SetCharacterName(player, character);
-        //ServerObjectManager.AddCharacter(player, character.gameObject);
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private void SingleplayerButton()

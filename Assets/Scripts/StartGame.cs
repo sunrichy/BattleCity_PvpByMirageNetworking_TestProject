@@ -16,6 +16,32 @@ public class StartGame : MonoBehaviour
     [SerializeField] private GameObejectSetActionSetting _gameObjectWhenFinishLoadGame;
 
     private float percentLoadGame;
+    private bool IsServer;
+    private int playerCount;
+
+    [System.Serializable]
+    public struct LoadingScenePercent 
+    {
+        public float percent;
+    }
+
+    [System.Serializable]
+    public struct LoadSceneName 
+    {
+        public string keySceneName;
+    }
+
+    [System.Serializable]
+    public struct GameOverMessage
+    {
+
+    }
+
+    [System.Serializable]
+    public struct PlayerDead
+    {
+
+    }
 
     private void Awake()
     {
@@ -24,33 +50,37 @@ public class StartGame : MonoBehaviour
         dictionary = _mapData.GetDictionaryMap();
         networkManager = GameManager.Instacne.networkManager;
 
-        networkManager.Server.Disconnected.AddListener((c) => SceneManager.LoadScene(0));
-        networkManager.Client.Disconnected.AddListener( (c) => SceneManager.LoadScene(0) );
-        
+        networkManager.Server.Disconnected.AddListener((c) => OnGameOver(new GameOverMessage()));
+        networkManager.Client.Disconnected.AddListener( (c) => OnGameOver(new GameOverMessage()));
 
-        if (!networkManager.Server.IsHost)
+        IsServer = networkManager.Server.IsHost;
+        if (!IsServer)
         {
-            networkManager.Client.MessageHandler.RegisterHandler<LoadScene>(OnGetLoadScene);
+            networkManager.Client.MessageHandler.RegisterHandler<LoadSceneName>(OnGetLoadSceneName);
+            networkManager.Client.MessageHandler.RegisterHandler<LoadingScenePercent>(OnGetLoadScene);
+            networkManager.Client.MessageHandler.RegisterHandler<GameOverMessage>(OnGameOver);
 
-            if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
-            {
-                TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
-                tileMapManager.tilemap.gameObject.SetActive(false);
 
-                networkManager.Client.World.onSpawn += (identity) =>
-                {
-                    if(identity.gameObject.tag == "Wall") 
-                    {
-                        identity.gameObject.transform.SetParent(tileMapManager.wallGrid.transform);
-                        identity.transform.localScale = Vector3.one;
-                    }
-                };
+            //if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
+            //{
+            //    TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
+            //    tileMapManager.tilemap.gameObject.SetActive(false);
 
-                tileMapManager.GenMapLocalOnly();
-            }
+            //    networkManager.Client.World.onSpawn += (identity) =>
+            //    {
+            //        if(identity.gameObject.tag == "Wall") 
+            //        {
+            //            identity.gameObject.transform.SetParent(tileMapManager.wallGrid.transform);
+            //            identity.transform.localScale = Vector3.one;
+            //        }
+            //    };
+
+            //    tileMapManager.GenMapLocalOnly();
+            //}
             StartCoroutine(WaitLocal());
             return;
         }
+        networkManager.Server.MessageHandler.RegisterHandler<PlayerDead>(OnPlayerDead);
         StartCoroutine(WaitServer());
     }
 
@@ -66,6 +96,10 @@ public class StartGame : MonoBehaviour
     IEnumerator WaitServer()
     {
         yield return new WaitForSeconds(2f);
+
+        networkManager.Server.SendToMany(networkManager.Server.AllPlayers,
+            new LoadSceneName() { keySceneName = GameManager.Instacne.loadLevelKey }, true);
+
 
         if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
         {
@@ -88,22 +122,60 @@ public class StartGame : MonoBehaviour
 
         }
 
+        playerCount = networkManager.Server.AllPlayers.Count;
         percentLoadGame = 1f;
 
-        networkManager.Server.SendToMany<LoadScene>(networkManager.Server.AllPlayers, new LoadScene() { percent = percentLoadGame} , true);
+        networkManager.Server.SendToMany<LoadingScenePercent>(networkManager.Server.AllPlayers, new LoadingScenePercent() { percent = percentLoadGame} , true);
         _gameObjectWhenFinishLoadGame.RunSetActive();
         enabled = false;
     }
 
-    [System.Serializable]
-    public struct LoadScene 
-    {
-        public float percent;
-    }
 
-    private void OnGetLoadScene(LoadScene loadScene) 
+    private void OnGetLoadScene(LoadingScenePercent loadScene) 
     {
         percentLoadGame = loadScene.percent;
-        networkManager.Client.MessageHandler.UnregisterHandler<LoadScene>();
+        networkManager.Client.MessageHandler.UnregisterHandler<LoadingScenePercent>();
+    }
+    private void OnGetLoadSceneName(LoadSceneName loadScene) 
+    {
+        networkManager.Client.MessageHandler.UnregisterHandler<LoadSceneName>();
+
+        if (dictionary.TryGetValue(loadScene.keySceneName, out var data))
+        {
+            TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
+            tileMapManager.tilemap.gameObject.SetActive(false);
+
+            networkManager.Client.World.onSpawn += (identity) =>
+            {
+                if (identity.gameObject.tag == "Wall")
+                {
+                    identity.gameObject.transform.SetParent(tileMapManager.wallGrid.transform);
+                    identity.transform.localScale = Vector3.one;
+                }
+            };
+
+            tileMapManager.GenMapLocalOnly();
+        }
+    }
+
+    private void OnGameOver(GameOverMessage gameOverMessage)
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void OnPlayerDead(PlayerDead playerDead)
+    {
+        Debug.Log("OnPlayerDead");
+
+        if (IsServer)
+        {
+            playerCount--;
+            if (playerCount <= 1)
+            {
+                networkManager.Server.SendToMany(networkManager.Server.AllPlayers, new GameOverMessage(), true);
+                OnGameOver(new());
+                return;
+            }
+        }
     }
 }

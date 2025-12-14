@@ -18,12 +18,18 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
     [SerializeField] private int hp = 5;
     [SerializeField] private Transform _frontTransform;
 
+    [SerializeField] private Color _enemyColor = Color.red;
+
     private void Start()
     {
         NetworkIdentity identity = gameObject.GetComponent<NetworkIdentity>();
         
         if (!IsLocalPlayer)
         {
+            if (gameObject.TryGetComponent(out SpriteRenderer spriteRenderer)) 
+            {
+                spriteRenderer.color = _enemyColor;
+            }
             Destroy(playerController);
         }
     }
@@ -35,6 +41,7 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
         if(hp <= 0) 
         {
             gameObject.SetActive(false);
+            GameManager.Instacne.networkManager.Client.Send(new StartGame.PlayerDead());
         }
     }
 
