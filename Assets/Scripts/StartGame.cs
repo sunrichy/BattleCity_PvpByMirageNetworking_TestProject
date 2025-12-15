@@ -4,16 +4,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class StartGame : MonoBehaviour
 {
     NetworkManager networkManager;
     [SerializeField] private MapDataBase _mapData;
     [SerializeField] private PlayerManager _playerManager;
+    [SerializeField] private Button _gameOverButton;
 
     Dictionary<string, MapDataBase.TileMapData> dictionary;
+    Dictionary<ulong, NetworkIdentity> allNetworkObjects = new ();
+
+    [Header("Load Game")]
     [SerializeField] private GameObejectSetActionSetting _gameObjectWhenStartLoadGame;
     [SerializeField] private GameObejectSetActionSetting _gameObjectWhenFinishLoadGame;
+
+    [Header("Game Over")]
+    [SerializeField] private GameObejectSetActionSetting _gameObjectWhenGameOver;
 
     private float percentLoadGame;
     private bool IsServer;
@@ -43,6 +51,13 @@ public class StartGame : MonoBehaviour
 
     }
 
+    [System.Serializable]
+    public struct SetSpawnObjectName
+    {
+        public ulong netId;
+        public string name;
+    }
+
     private void Awake()
     {
         _gameObjectWhenStartLoadGame.RunSetActive();
@@ -54,11 +69,18 @@ public class StartGame : MonoBehaviour
         networkManager.Client.Disconnected.AddListener( (c) => OnGameOver(new GameOverMessage()));
 
         IsServer = networkManager.Server.IsHost;
+
+        networkManager.Client.World.onSpawn += (identity) =>
+        {
+            allNetworkObjects.Add(identity.NetId, identity);
+        };
+
         if (!IsServer)
         {
             networkManager.Client.MessageHandler.RegisterHandler<LoadSceneName>(OnGetLoadSceneName);
             networkManager.Client.MessageHandler.RegisterHandler<LoadingScenePercent>(OnGetLoadScene);
             networkManager.Client.MessageHandler.RegisterHandler<GameOverMessage>(OnGameOver);
+            networkManager.Client.MessageHandler.RegisterHandler<SetSpawnObjectName>(OnSetSpawnObjectName);
 
 
             //if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
@@ -116,10 +138,10 @@ public class StartGame : MonoBehaviour
                 b.transform.rotation = point.rotation;
                 NetworkIdentity identity = b.gameObject.GetComponent<NetworkIdentity>();
 
-
+                identity.name = "Player_" + (i + 1);
                 networkManager.ServerObjectManager.AddCharacter(playerData, identity);
+                networkManager.Server.SendToMany(networkManager.Server.AllPlayers, new SetSpawnObjectName() { netId = identity.NetId, name = identity.name} , true);
             }
-
         }
 
         playerCount = networkManager.Server.AllPlayers.Count;
@@ -136,6 +158,7 @@ public class StartGame : MonoBehaviour
         percentLoadGame = loadScene.percent;
         networkManager.Client.MessageHandler.UnregisterHandler<LoadingScenePercent>();
     }
+
     private void OnGetLoadSceneName(LoadSceneName loadScene) 
     {
         networkManager.Client.MessageHandler.UnregisterHandler<LoadSceneName>();
@@ -160,7 +183,12 @@ public class StartGame : MonoBehaviour
 
     private void OnGameOver(GameOverMessage gameOverMessage)
     {
-        SceneManager.LoadScene(0);
+        _gameObjectWhenGameOver.RunSetActive();
+        Destroy(GameManager.Instacne.networkManager.gameObject);
+        _gameOverButton.onClick.AddListener(() => 
+        {
+            SceneManager.LoadScene(0);
+        });
     }
 
     private void OnPlayerDead(PlayerDead playerDead)
@@ -176,6 +204,14 @@ public class StartGame : MonoBehaviour
                 OnGameOver(new());
                 return;
             }
+        }
+    }
+
+    private void OnSetSpawnObjectName(SetSpawnObjectName message)
+    {
+        if (allNetworkObjects.TryGetValue(message.netId, out NetworkIdentity identity))
+        {
+            identity.name = message.name;
         }
     }
 }

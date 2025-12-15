@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum MoveDirection
@@ -29,6 +30,14 @@ public struct GameObejectSetActionSetting
         for (int i = 0; i < gameObjectDatas.Length; i++) 
         {
             gameObjectDatas[i].gameObject.SetActive(gameObjectDatas[i].active);
+        }
+    }
+
+    public void ReverseSetActive() 
+    {
+        for (int i = 0; i < gameObjectDatas.Length; i++) 
+        {
+            gameObjectDatas[i].gameObject.SetActive(!gameObjectDatas[i].active);
         }
     }
 }

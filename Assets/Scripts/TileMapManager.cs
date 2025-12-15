@@ -1,4 +1,5 @@
 using Mirage;
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -53,11 +54,21 @@ public class TileMapManager : MonoBehaviour
                 GameObject newGame = null;
                 newGame = Instantiate(data.gameObject, tilemap.layoutGrid.transform);
                 newGame.transform.position = tilemap.GetCellCenterWorld(posIndex);
+                newGame.name += "_Tile_" + current;
 
                 if (networkManager && networkManager.Client.IsHost && !data.localOnly) 
                 {
-                    networkManager.ServerObjectManager.Spawn(newGame, newGame.GetOrAddComponent<NetworkIdentity>().PrefabHash);
-                }           
+                    newGame.name += "_Network";
+                    NetworkIdentity identity = newGame.GetOrAddComponent<NetworkIdentity>();
+
+                    networkManager.ServerObjectManager.Spawn(newGame, identity.PrefabHash);
+                    networkManager.Server.SendToMany(networkManager.Server.AllPlayers, 
+                        new StartGame.SetSpawnObjectName() { netId = identity.NetId, name = newGame.name}, true );
+                }
+                else 
+                {
+                    newGame.name += "_Local";
+                }
             }
             current++;
             percentLoad = current / max;
@@ -77,7 +88,7 @@ public class TileMapManager : MonoBehaviour
 
 
         BoundsInt bounds = tilemap.cellBounds;
-
+        int index = 0;
         foreach (Vector3Int posIndex in bounds.allPositionsWithin)
         {
             TileBase tile = tilemap.GetTile(posIndex);
@@ -94,8 +105,11 @@ public class TileMapManager : MonoBehaviour
                     GameObject newGame = null;
                     newGame = Instantiate(data.gameObject, tilemap.layoutGrid.transform);
                     newGame.transform.position = tilemap.GetCellCenterWorld(posIndex);
+                    newGame.name += "_Local_" + index;
                 }
             }
+
+            index++;
         }
 
         tilemap.gameObject.SetActive(false);
