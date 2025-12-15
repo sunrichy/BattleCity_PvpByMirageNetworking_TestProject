@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b28bcd5efb0813242b6ee9319deee429, type: 3}
+  m_Name: MusicDataBase
+  m_EditorClassIdentifier: 
+  clipSoundDatas:
+  - _audioClip: {fileID: 8300000, guid: 1ec31b6e5fd1dd74e85c9c0f254f46e0, type: 3}
+    _key: MainMenu
+  - _audioClip: {fileID: 8300000, guid: 897f9340de8231043b048e4a3eff93d2, type: 3}
+    _key: Gameplay
+  - _audioClip: {fileID: 8300000, guid: b98dee8d7c864f9418aa551583ded0b1, type: 3}
+    _key: GameOver
+  - _audioClip: {fileID: 8300000, guid: 8adc5824997b0a54db07523b17405b11, type: 3}
+    _key: Shoot
+  - _audioClip: {fileID: 8300000, guid: dcd1e0e637c09ad4e8a6c57a254e82dc, type: 3}
+    _key: Click_UI

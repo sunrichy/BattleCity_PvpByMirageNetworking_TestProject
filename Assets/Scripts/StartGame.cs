@@ -3,8 +3,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class StartGame : MonoBehaviour
 {
@@ -106,6 +106,11 @@ public class StartGame : MonoBehaviour
         StartCoroutine(WaitServer());
     }
 
+    private void Start()
+    {
+        MusicBox.Instacne.PlayBg("Gameplay");
+    }
+
     IEnumerator WaitLocal() 
     {
         while(percentLoadGame < 1f) 
@@ -184,9 +189,11 @@ public class StartGame : MonoBehaviour
     private void OnGameOver(GameOverMessage gameOverMessage)
     {
         _gameObjectWhenGameOver.RunSetActive();
+        MusicBox.Instacne.PlayBg("GameOver");
         Destroy(GameManager.Instacne.networkManager.gameObject);
         _gameOverButton.onClick.AddListener(() => 
         {
+            MusicBox.Instacne.StopBg();
             SceneManager.LoadScene(0);
         });
     }

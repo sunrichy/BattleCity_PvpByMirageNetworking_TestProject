@@ -108,5 +108,13 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
         b.transform.position = _frontTransform.position;
         b.Init(currentDir);
         GameManager.Instacne.networkManager.ServerObjectManager.Spawn(b.gameObject.GetComponent<NetworkIdentity>());
+        MusicBox.Instacne.PlaySfx("Shoot");
+        ClientFire();
+    }
+
+    [ClientRpc]
+    private void ClientFire() 
+    {
+        MusicBox.Instacne.PlaySfx("Shoot");
     }
 }

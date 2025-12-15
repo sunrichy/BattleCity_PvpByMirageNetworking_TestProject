@@ -32,7 +32,8 @@ public class Init : MonoBehaviour
 
     private void Start()
     {
-
+        MusicBox.Instacne.StopBg();
+        MusicBox.Instacne.PlayBg("MainMenu");
     }
 
     private void ExitButton()
