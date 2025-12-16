@@ -21,6 +21,9 @@ public class MusicBox : MonoBehaviour
 
     private Dictionary<string, AudioClip> audioIndex = new();
 
+    private float bgVolume;
+    private float sfxVolume;
+
     private void Awake()
     {
         if (_instacne) 
@@ -35,6 +38,9 @@ public class MusicBox : MonoBehaviour
         {
             audioIndex.Add(_musicDataBase.clipSoundDatas[i].key, _musicDataBase.clipSoundDatas[i].audioClip);
         }
+
+        bgVolume = _audioBg.volume;
+        sfxVolume = _audioSfx.volume;
 
         DontDestroyOnLoad(_instacne);
     }
@@ -83,5 +89,27 @@ public class MusicBox : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void SetBgVolume(float value) 
+    {
+        bgVolume = value;
+        _audioBg.volume = bgVolume;
+    }
+
+    public void SetSfxVolume(float value) 
+    {
+        sfxVolume = value;
+        _audioSfx.volume = sfxVolume;
+    }
+
+    public void MuteBgVolume(bool mute = true) 
+    {
+        _audioBg.volume = mute ? 0f : bgVolume;
+    }
+
+    public void MuteSfxVolume(bool mute = true) 
+    {
+        _audioSfx.volume = mute ? 0f : sfxVolume;
     }
 }
