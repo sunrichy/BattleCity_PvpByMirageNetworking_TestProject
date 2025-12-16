@@ -19,6 +19,8 @@ public class StartGame : MonoBehaviour
     [Header("Load Game")]
     [SerializeField] private GameObejectSetActionSetting _gameObjectWhenStartLoadGame;
     [SerializeField] private GameObejectSetActionSetting _gameObjectWhenFinishLoadGame;
+    [SerializeField] private GameObejectSetActionSetting _gameObjectWhenHostOnlyLoadGame;
+    [SerializeField] private GameObejectSetActionSetting _gameObjectWhenClientOnlyLoadGame;
 
     [Header("Game Over")]
     [SerializeField] private GameObejectSetActionSetting _gameObjectWhenGameOver;
@@ -75,35 +77,20 @@ public class StartGame : MonoBehaviour
             allNetworkObjects.Add(identity.NetId, identity);
         };
 
+        networkManager.Client.MessageHandler.RegisterHandler<LoadSceneName>(OnGetLoadSceneName);
         if (!IsServer)
         {
-            networkManager.Client.MessageHandler.RegisterHandler<LoadSceneName>(OnGetLoadSceneName);
+            _gameObjectWhenClientOnlyLoadGame.RunSetActive();
             networkManager.Client.MessageHandler.RegisterHandler<LoadingScenePercent>(OnGetLoadScene);
             networkManager.Client.MessageHandler.RegisterHandler<GameOverMessage>(OnGameOver);
             networkManager.Client.MessageHandler.RegisterHandler<SetSpawnObjectName>(OnSetSpawnObjectName);
 
-
-            //if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
-            //{
-            //    TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
-            //    tileMapManager.tilemap.gameObject.SetActive(false);
-
-            //    networkManager.Client.World.onSpawn += (identity) =>
-            //    {
-            //        if(identity.gameObject.tag == "Wall") 
-            //        {
-            //            identity.gameObject.transform.SetParent(tileMapManager.wallGrid.transform);
-            //            identity.transform.localScale = Vector3.one;
-            //        }
-            //    };
-
-            //    tileMapManager.GenMapLocalOnly();
-            //}
             StartCoroutine(WaitLocal());
             return;
         }
+
+        _gameObjectWhenHostOnlyLoadGame.RunSetActive();
         networkManager.Server.MessageHandler.RegisterHandler<PlayerDead>(OnPlayerDead);
-        StartCoroutine(WaitServer());
     }
 
     private void Start()
@@ -120,43 +107,6 @@ public class StartGame : MonoBehaviour
 
         _gameObjectWhenFinishLoadGame.RunSetActive();
     }
-    IEnumerator WaitServer()
-    {
-        yield return new WaitForSeconds(2f);
-
-        networkManager.Server.SendToMany(networkManager.Server.AllPlayers,
-            new LoadSceneName() { keySceneName = GameManager.Instacne.loadLevelKey }, true);
-
-
-        if (dictionary.TryGetValue(GameManager.Instacne.loadLevelKey, out var data))
-        {
-            TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
-            tileMapManager.GenMap();
-
-
-            for (int i = 0; i < networkManager.Server.AllPlayers.Count; i++)
-            {
-                var playerData = networkManager.Server.AllPlayers.ElementAt(i);
-                var point = tileMapManager.playerSpawnPoints[i];
-                PlayerManager b = Instantiate(_playerManager, null);
-                b.transform.position = point.position;
-                b.transform.rotation = point.rotation;
-                NetworkIdentity identity = b.gameObject.GetComponent<NetworkIdentity>();
-
-                identity.name = "Player_" + (i + 1);
-                networkManager.ServerObjectManager.AddCharacter(playerData, identity);
-                networkManager.Server.SendToMany(networkManager.Server.AllPlayers, new SetSpawnObjectName() { netId = identity.NetId, name = identity.name} , true);
-            }
-        }
-
-        playerCount = networkManager.Server.AllPlayers.Count;
-        percentLoadGame = 1f;
-
-        networkManager.Server.SendToMany<LoadingScenePercent>(networkManager.Server.AllPlayers, new LoadingScenePercent() { percent = percentLoadGame} , true);
-        _gameObjectWhenFinishLoadGame.RunSetActive();
-        enabled = false;
-    }
-
 
     private void OnGetLoadScene(LoadingScenePercent loadScene) 
     {
@@ -168,11 +118,9 @@ public class StartGame : MonoBehaviour
     {
         networkManager.Client.MessageHandler.UnregisterHandler<LoadSceneName>();
 
-        if (dictionary.TryGetValue(loadScene.keySceneName, out var data))
+        if (dictionary.TryGetValue(loadScene.keySceneName, out var data)) 
         {
             TileMapManager tileMapManager = Instantiate(data.tileMapManager, null);
-            tileMapManager.tilemap.gameObject.SetActive(false);
-
             networkManager.Client.World.onSpawn += (identity) =>
             {
                 if (identity.gameObject.tag == "Wall")
@@ -182,7 +130,44 @@ public class StartGame : MonoBehaviour
                 }
             };
 
-            tileMapManager.GenMapLocalOnly();
+            if (IsServer) 
+            {
+                StartCoroutine(Wait());
+                IEnumerator Wait() 
+                {
+                    yield return new WaitForSeconds(1f);
+                    tileMapManager.GenMap();
+
+
+                    for (int i = 0; i < networkManager.Server.AllPlayers.Count; i++)
+                    {
+                        var playerData = networkManager.Server.AllPlayers.ElementAt(i);
+                        var point = tileMapManager.playerSpawnPoints[i];
+                        PlayerManager b = Instantiate(_playerManager, null);
+                        b.transform.position = point.position;
+                        b.transform.rotation = point.rotation;
+                        NetworkIdentity identity = b.gameObject.GetComponent<NetworkIdentity>();
+
+                        identity.name = "Player_" + (i + 1);
+                        networkManager.ServerObjectManager.AddCharacter(playerData, identity);
+                        networkManager.Server.SendToMany(networkManager.Server.AllPlayers, 
+                            new SetSpawnObjectName() { netId = identity.NetId, name = identity.name }, true);
+                    }
+
+                    playerCount = networkManager.Server.AllPlayers.Count;
+                    percentLoadGame = 1f;
+
+                    networkManager.Server.SendToMany(networkManager.Server.AllPlayers, 
+                        new LoadingScenePercent() { percent = percentLoadGame }, true);
+                    _gameObjectWhenFinishLoadGame.RunSetActive();
+                    enabled = false;
+                }
+            }
+            else 
+            {
+                tileMapManager.tilemap.gameObject.SetActive(false);
+                tileMapManager.GenMapLocalOnly();
+            }
         }
     }
 

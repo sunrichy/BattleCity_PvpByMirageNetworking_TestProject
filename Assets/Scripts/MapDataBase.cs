@@ -4,8 +4,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MapDataBase", menuName = "MapDataBase")]
 public class MapDataBase : ScriptableObject
 {
-    [SerializeField] private TileData[] _tileDatas;
     [SerializeField] private TileMapData[] _tileMapManagers;
+    public TileMapData[] tileMapManagers => _tileMapManagers;
 
     [System.Serializable]
     public struct TileMapData

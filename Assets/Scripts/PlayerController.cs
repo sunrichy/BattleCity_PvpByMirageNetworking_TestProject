@@ -29,13 +29,21 @@ public class PlayerController : MonoBehaviour
     public MoveDirection MoveDir { get; private set; }
     public bool Shoot { get; private set; }
 
+    [SerializeField] private float _delayShoot = 1f;
+    private float n_delayShoot;
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) 
+        if (Input.GetKeyDown(KeyCode.Space) && n_delayShoot <= 0f)
         {
             Shoot = true;
+            n_delayShoot = _delayShoot;
+        }
+
+        if (n_delayShoot > 0f) 
+        {
+            n_delayShoot -= Time.deltaTime;
         }
 
         if (MoveDir != MoveDirection.Idle)
@@ -66,6 +74,7 @@ public class PlayerController : MonoBehaviour
             MoveDir = MoveDirection.Left;
             return;
         }
+
     }
 
     public void ResetInput() 
