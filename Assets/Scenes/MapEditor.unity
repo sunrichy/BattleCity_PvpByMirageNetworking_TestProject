@@ -361,9 +361,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1166538326926020784, guid: cb8506c25fcc2614a9d7b1276d75f0e0, type: 3}
+      propertyPath: m_ChunkCullingBounds.y
+      value: 0.035000026
+      objectReference: {fileID: 0}
     - target: {fileID: 2484055725694759051, guid: cb8506c25fcc2614a9d7b1276d75f0e0, type: 3}
       propertyPath: m_Name
       value: TestMap 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2484055725694759051, guid: cb8506c25fcc2614a9d7b1276d75f0e0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -418,9 +426,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1166538326926020784, guid: 54ce30e9ad1e7744995668b5d30c8f7e, type: 3}
+      propertyPath: m_ChunkCullingBounds.y
+      value: 0.035000026
+      objectReference: {fileID: 0}
     - target: {fileID: 2484055725694759051, guid: 54ce30e9ad1e7744995668b5d30c8f7e, type: 3}
       propertyPath: m_Name
       value: TestMap
+      objectReference: {fileID: 0}
+    - target: {fileID: 2484055725694759051, guid: 54ce30e9ad1e7744995668b5d30c8f7e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

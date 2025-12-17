@@ -23,3 +23,7 @@ MonoBehaviour:
     _key: Shoot
   - _audioClip: {fileID: 8300000, guid: dcd1e0e637c09ad4e8a6c57a254e82dc, type: 3}
     _key: Click_UI
+  - _audioClip: {fileID: 8300000, guid: 9662c1ad4b406214c83806df53396ee2, type: 3}
+    _key: GetShootWall
+  - _audioClip: {fileID: 8300000, guid: d90c183f03aab7648a22bbb183e68e88, type: 3}
+    _key: GetShootPlayer

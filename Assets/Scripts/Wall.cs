@@ -8,6 +8,8 @@ public class Wall : NetworkBehaviour, ITakeDamage
 
     public void TakeDamage()
     {
+        PlaySfx();
+
         if (invisible) 
         {
             return;
@@ -24,6 +26,15 @@ public class Wall : NetworkBehaviour, ITakeDamage
             {
                 Destroy(gameObject);
             }
+        }
+    }
+
+    [ClientRpc]
+    private void PlaySfx() 
+    {
+        if (MusicBox.Instacne)
+        {
+            MusicBox.Instacne.PlaySfx("GetShootWall");
         }
     }
 }

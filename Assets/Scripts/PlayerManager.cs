@@ -16,20 +16,18 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
 
     [SyncVar]
     [SerializeField] private int hp = 5;
-    [SerializeField] private Transform _frontTransform;
 
-    [SerializeField] private Color _enemyColor = Color.red;
+    [SerializeField] private Transform _bulletSpawn;
+    [SerializeField] private PlayerCostume _playerCostume;
 
     private void Start()
     {
         NetworkIdentity identity = gameObject.GetComponent<NetworkIdentity>();
-        
+        _playerCostume.SetCostume(IsLocalPlayer);
+        _playerCostume.SetHp(hp);
+
         if (!IsLocalPlayer)
         {
-            if (gameObject.TryGetComponent(out SpriteRenderer spriteRenderer)) 
-            {
-                spriteRenderer.color = _enemyColor;
-            }
             Destroy(playerController);
         }
     }
@@ -37,7 +35,10 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
     [ClientRpc]
     public void TakeDamage()
     {
+        MusicBox.Instacne.PlaySfx("GetShootPlayer");
         hp -= 1;
+        _playerCostume.SetHp(hp);
+
         if(hp <= 0) 
         {
             gameObject.SetActive(false);
@@ -105,7 +106,7 @@ public class PlayerManager : NetworkBehaviour, ITakeDamage
     private void CmdFire()
     {
         Bullet b = Instantiate(bullet, null);
-        b.transform.position = _frontTransform.position;
+        b.transform.position = _bulletSpawn.position;
         b.Init(currentDir);
         GameManager.Instacne.networkManager.ServerObjectManager.Spawn(b.gameObject.GetComponent<NetworkIdentity>());
         MusicBox.Instacne.PlaySfx("Shoot");
