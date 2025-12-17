@@ -38,6 +38,8 @@ public class Bullet : MonoBehaviour
         }
 
         vector2Dir = direction.MoveDirectionToVector3();
+        transform.localRotation = Quaternion.Euler(90f * ((int)direction - 1) * Vector3.back);
+
         networkIdentity = GetComponent<NetworkIdentity>();
         init = true;
     }
