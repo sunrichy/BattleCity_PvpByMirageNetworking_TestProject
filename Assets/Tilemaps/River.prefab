@@ -11,12 +11,10 @@ GameObject:
   - component: {fileID: 8456088667489319512}
   - component: {fileID: 4478284591745273790}
   - component: {fileID: 5448189632765867754}
-  - component: {fileID: 8731427715983224945}
   - component: {fileID: -226325374263481623}
-  - component: {fileID: -6566687179338372603}
   m_Layer: 0
-  m_Name: Wall_1Hp
-  m_TagString: Wall
+  m_Name: River
+  m_TagString: CanNotMoveTo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -79,9 +77,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 744b01a2b4bf4114588f977238c7186c, type: 3}
-  m_Color: {r: 0.81886786, g: 0.62292325, b: 0.14059804, a: 1}
+  m_SortingOrder: -100
+  m_Sprite: {fileID: 21300000, guid: f49e1bf8b07a33647bf39d084a790475, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -137,25 +135,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8731427715983224945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 869630123268367122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9721ba973afd05545ac9869e682fee38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncSettings:
-    From: 2
-    To: 3
-    Timing: 0
-    Interval: 0.1
-  hp: 1
-  invisible: 0
 --- !u!50 &-226325374263481623
 Rigidbody2D:
   serializedVersion: 5
@@ -183,26 +162,3 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &-6566687179338372603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 869630123268367122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SpawnSettings:
-    SendPosition: 1
-    SendRotation: 0
-    SendScale: 0
-    SendName: 0
-    SendActive: 1
-  _sceneId: 0
-  _prefabHash: -200505415
-  ServerObjectManager: {fileID: 0}
-  ClientObjectManager: {fileID: 0}
-  _hasSpawned: 0

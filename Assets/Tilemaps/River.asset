@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Wall_1Hp
+  m_Name: River
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: 744b01a2b4bf4114588f977238c7186c, type: 3}
-  m_Color: {r: 0.81960785, g: 0.62352943, b: 0.14117648, a: 1}
+  m_Sprite: {fileID: 21300000, guid: f49e1bf8b07a33647bf39d084a790475, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
     e01: 0
