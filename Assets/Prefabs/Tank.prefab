@@ -777,7 +777,7 @@ MonoBehaviour:
   playerController: {fileID: 368286825980644060}
   speed: 5
   bullet: {fileID: 4436726852599470566, guid: b204825b978b2e14998186cc0cf3f1ad, type: 3}
-  hp: 5
+  hp: 6
   _bulletSpawn: {fileID: 6904300370669990522}
   _playerCostume: {fileID: 3140380901848377851}
 --- !u!114 &3140380901848377851

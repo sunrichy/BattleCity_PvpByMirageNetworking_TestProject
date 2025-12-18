@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a43bbc5978edc8f40b40b8cc8c3a599d, type: 3}
   m_Name: MapDataBase
   m_EditorClassIdentifier: 
-  _tileDatas: []
   _tileMapManagers:
-  - key: 1
+  - key: Great Wall Map
     tileMapManager: {fileID: 5136627179046615310, guid: 54ce30e9ad1e7744995668b5d30c8f7e, type: 3}
-  - key: 2
+  - key: Strait Map
     tileMapManager: {fileID: 5136627179046615310, guid: cb8506c25fcc2614a9d7b1276d75f0e0, type: 3}
-  - key: 3
+  - key: Dual River Map
     tileMapManager: {fileID: 5136627179046615310, guid: c123e3c0d04d3f54f86d8b0c85f25791, type: 3}
+  - key: Empty Map
+    tileMapManager: {fileID: 5136627179046615310, guid: 200255655d52ef14c9a255b1a64a9ad2, type: 3}
