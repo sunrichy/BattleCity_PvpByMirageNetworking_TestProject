@@ -1,9 +1,9 @@
 using Mirage;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 
 public class Init : MonoBehaviour
@@ -14,6 +14,12 @@ public class Init : MonoBehaviour
     [SerializeField] private Button _multiplayerButton;
     [SerializeField] private Button _exitButton;
 
+    [SerializeField] private Button _closeConnectButton;
+    [SerializeField] private TMPro.TextMeshProUGUI _connectingText;
+
+    [SerializeField] private GameObejectSetActionSetting _waitPlayerGameObjects;
+
+
     private void Awake()
     {
         GameManager gameManager = GameManager.Instacne;
@@ -23,17 +29,31 @@ public class Init : MonoBehaviour
             Destroy(GameManager.Instacne.networkManager.gameObject);
         }
 
+        _waitPlayerGameObjects.ReverseSetActive();
+
         _singleplayerButton.onClick.AddListener(SingleplayerButton);
         _multiplayerButton.onClick.AddListener(MultiplayerButton);
         _exitButton.onClick.AddListener(ExitButton);
 
-        gameManager.loadLevelKey = "1";
+        _closeConnectButton.onClick.AddListener(CloseConnectButton);
     }
+
 
     private void Start()
     {
         MusicBox.Instacne.StopBg();
         MusicBox.Instacne.PlayBg("MainMenu");
+    }
+
+    private void CloseConnectButton()
+    {
+        StopCoroutine(ConnectingIEnumerator);
+        _waitPlayerGameObjects.ReverseSetActive();
+
+        if (GameManager.Instacne.networkManager)
+        {
+            Destroy(GameManager.Instacne.networkManager.gameObject);
+        }
     }
 
     private void ExitButton()
@@ -64,13 +84,15 @@ public class Init : MonoBehaviour
             GameManager.Instacne.SetNetworkManager(networkManager);
         }
 
-        StartCoroutine(Connecting());
-
-        
+        _waitPlayerGameObjects.RunSetActive();
+        ConnectingIEnumerator = Connecting();
+        StartCoroutine(ConnectingIEnumerator);
     }
 
+    IEnumerator ConnectingIEnumerator;
     IEnumerator Connecting() 
     {
+        _connectingText.text = "Connecting";
         NetworkManager networkManager = GameManager.Instacne.networkManager;
         networkManager.Client.Connect();
 
@@ -97,37 +119,38 @@ public class Init : MonoBehaviour
 
                 yield return null;
                 timer -= Time.deltaTime;
+                _connectingText.text = "Connecting";
+                for (int i = 0; i < Mathf.RoundToInt(Mathf.Abs(timer - 5f) / 0.5f); i++) 
+                {
+                    _connectingText.text += ".";
+                }
             }
             networkManager.Client.Disconnected.RemoveListener(unityAction);
             if (!networkManager.Client.IsConnected) 
             {
                 networkManager.Server.StartServer(networkManager.Client);
+                _connectingText.text = "Start Host, Wait for player";
             }
         }
 
-        while (networkManager.Server.AllPlayers.Count != 2) 
         {
-            yield return null;
+            float timer = 0f;
+
+            while (networkManager.Server.AllPlayers.Count != 2) 
+            {
+                yield return null;
+                timer += Time.deltaTime;
+                _connectingText.text = "Start Host, Wait for player";
+                for (int i = 0; i < Mathf.RoundToInt(timer % 5f); i++)
+                {
+                    _connectingText.text += ".";
+                }
+            }
         }
-
-        //UnityAction<ClientStoppedReason> unityEvent2 = (s) =>
-        //{
-        //    if (SceneManager.GetActiveScene().buildIndex != 0)
-        //        SceneManager.LoadScene(0);
-
-        //    Debug.LogError(s);
-        //};
-        //networkManager.Client.Disconnected.AddListener(unityEvent2);
-
-        if (networkManager.Server.IsHost) 
+        _connectingText.text = "Starting game";
+        if (networkManager.Server.IsHost)
         {
             yield return networkManager.NetworkSceneManager.ServerLoadSceneNormalAsync("StartGame");
-            // networkManager.NetworkSceneManager.SetSceneIsReady();
         }
-    }
-
-    public void Startgame() 
-    {
-        
     }
 }

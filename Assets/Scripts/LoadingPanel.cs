@@ -10,7 +10,13 @@ public class LoadingPanel : MonoBehaviour
     [SerializeField] private Transform _content;
     [SerializeField] private Button _cellPrefab;
 
-    List<Button> allCells = new(); 
+    [SerializeField] private TMPro.TextMeshProUGUI _hostText;
+    [SerializeField] private float _timerToChooseLevel = 10f;
+    
+    List<Button> allCells = new();
+    bool chooseLevel;
+    float n_timerToChooseLevel;
+    string formatText;
 
     private void Awake()
     {
@@ -32,11 +38,32 @@ public class LoadingPanel : MonoBehaviour
             }
         }
 
+        n_timerToChooseLevel = _timerToChooseLevel;
+        formatText = _hostText.text;
         _cellPrefab.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (chooseLevel) 
+        {
+            return;
+        }
+
+
+        if (n_timerToChooseLevel <= 0f) 
+        {
+            allCells[Random.Range(0, allCells.Count)].onClick.Invoke();
+            return;
+        }
+
+        _hostText.text = string.Format(formatText, n_timerToChooseLevel.ToString("0"));
+        n_timerToChooseLevel -= Time.deltaTime;
     }
 
     public void CallLoadMap(string key) 
     {
+        chooseLevel = true;
         NetworkManager networkManager = GameManager.Instacne.networkManager;
         networkManager.Server.SendToMany(networkManager.Server.AllPlayers, 
             new StartGame.LoadSceneName() { keySceneName = key }, false);

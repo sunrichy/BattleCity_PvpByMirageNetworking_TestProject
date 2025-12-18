@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 7214486171845253763}
   - component: {fileID: 3113466878923253012}
   - component: {fileID: 8515928912958356926}
-  - component: {fileID: 2082087984846117872}
   - component: {fileID: 2643780422093222124}
   - component: {fileID: 7985382046368383896}
   m_Layer: 0
@@ -206,29 +205,6 @@ MonoBehaviour:
   - {fileID: -6566687179338372603, guid: 7564d2ec7aa1c4b46836588ba68bd116, type: 3}
   - {fileID: -1134133176864137562, guid: 375a2d37b4318194a88c3d0146f81024, type: 3}
   NetworkPrefabs: {fileID: 0}
---- !u!114 &2082087984846117872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5977750287187525065}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7aaac73a16c040fd871cb977b5c557b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Client: {fileID: 7582089069511925740}
-  Server: {fileID: 7937637414231328006}
-  SceneManager: {fileID: 7214486171845253763}
-  ClientObjectManager: {fileID: 8515928912958356926}
-  ServerObjectManager: {fileID: 3113466878923253012}
-  PlayerPrefab: {fileID: 0}
-  AutoSpawn: 0
-  SetName: 1
-  startPositionIndex: 0
-  startPositions: []
-  playerSpawnMethod: 0
 --- !u!114 &2643780422093222124
 MonoBehaviour:
   m_ObjectHideFlags: 0
