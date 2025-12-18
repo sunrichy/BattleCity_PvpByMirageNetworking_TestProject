@@ -12,6 +12,15 @@ public class SettingPanel : MonoBehaviour
         _muteSfxToggle.onValueChanged.AddListener(OnSfxToggle);
     }
 
+    private void OnEnable()
+    {
+        if (MusicBox.Instacne) 
+        {
+            _muteBgToggle.isOn = MusicBox.Instacne.MuteBg;
+            _muteSfxToggle.isOn = MusicBox.Instacne.MuteSfx;
+        }
+    }
+
     private void OnBgToggle(bool value)
     {
         if (MusicBox.Instacne) 

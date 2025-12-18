@@ -24,6 +24,9 @@ public class MusicBox : MonoBehaviour
     private float bgVolume;
     private float sfxVolume;
 
+    public bool MuteBg { get; private set; }
+    public bool MuteSfx { get; private set; }
+
     private void Awake()
     {
         if (_instacne) 
@@ -106,10 +109,12 @@ public class MusicBox : MonoBehaviour
     public void MuteBgVolume(bool mute = true) 
     {
         _audioBg.volume = mute ? 0f : bgVolume;
+        MuteBg = mute;
     }
 
     public void MuteSfxVolume(bool mute = true) 
     {
         _audioSfx.volume = mute ? 0f : sfxVolume;
+        MuteSfx = mute;
     }
 }
